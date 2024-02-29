@@ -3,6 +3,11 @@
  * This code does not get complied by the Makefile
  *
  */
+
+#include "project.h"
+#include "mygemm.h"
+
+
 void dgemm_ukernel( int m, int n, int k, double *A, int ldA,
              double *B, int ldB, double *C, int ldC )
 {

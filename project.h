@@ -9,6 +9,7 @@
 
 #include<immintrin.h>
 
+#define _XOPEN_SOURCE 
 #include "blis.h"
 #include "mygemm.h"
 

@@ -79,14 +79,13 @@ void ukernel( int m, int n, int k, double *A, int rsA, int csA,
 //        }
 
 void innerloop( int m, int n, int k, double *A, int rsA, int csA, 
-	     double *B, int rsB, int csB,  double *C, int rsC, int csC ,
-       int a, int b, int c) 
+	     double *B, int rsB, int csB, double *C, int rsC, int csC) 
 {
   for ( int j=0; j<n; j += NR )
     for ( int i=0; i<m; i += MR )
     {
       //gamma( i,j ) += alpha( i,p ) * beta( p,j );
-      ukernel(MR, NR, KC, &alpha(i + c, b), rsA, csA, &beta(b, j + a), rsB, csB, &gamma(i + c, j + a), rsC, csC );
+      ukernel(MR, NR, k, A + i * rsA, rsA, csA, B + j * csB, rsB, csB, C + rsC * i + csC * j, rsC, csC );
     }
 }
 
@@ -101,6 +100,7 @@ void fiveloops( int m, int n, int k, double *A, int rsA, int csA,
     }
   }
 }
+
 
 
 

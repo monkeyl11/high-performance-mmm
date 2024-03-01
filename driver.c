@@ -16,6 +16,12 @@ int main(int argc, char *argv[])
 	// 	b[i] = i;
 	// }
 	// printMat(b, 48, 48);
+	// printf("\n\n\n\n\n");
+	// double* newMat = malloc(2304 * sizeof(double));
+	// packMatrixB(b, 1, 48, newMat);
+	// printMat(newMat, 48, 48);
+
+
 	// double* c = calloc(2304, sizeof(double));
 	// fiveloops(48,48,48, testMatrix, 1, 48, 
 	//      b, 1, 48, c, 1, 48 );

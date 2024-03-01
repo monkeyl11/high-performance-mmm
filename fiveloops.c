@@ -1,7 +1,8 @@
 //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
 
 #include "project.h"
-
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define DOUBLES_STORED_IN_REG 4
 
 void ukernel_old( int m, int n, int k, double *A, int rsA, int csA, 
@@ -193,14 +194,14 @@ void ukernel( int m, int n, int k, double *A, int rsA, int csA,
 }
 
 //packing MCxKC matrix
-void packMatrixA(double *A, int rsA, int csA, double* newMatrix) {
+void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m) {
     for (int i = 0; i < KC * MC; i++) {
       newMatrix[i] = A[(i % MR) * rsA + csA * ((int)(i / MR) % KC) + (MR * (int)(i / (MR * KC))) * rsA];
     }
 }
 
 //NCxKC
-void packMatrixB(double *B, int rsB, int csB, double* newMatrix) {
+void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n) {
   for (int i = 0; i < KC * NC; i++) {
       newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
     }
@@ -221,11 +222,11 @@ void fiveloops( int m, int n, int k, double *A, int rsA, int csA,
 {
   for (int a = 0; a < n; a += NC) {
     for (int b = 0; b < k; b += KC) {
-      double* packedB = malloc(sizeof(double) * KC * NC);
-      packMatrixB(&beta(b, a), rsB, csB, packedB);
+      double* packedB = calloc(KC * NC, sizeof(double));
+      packMatrixB(&beta(b, a), rsB, csB, packedB, n);
       for (int c = 0; c < m; c += MC) {
-        double* packedA = malloc(sizeof(double) * KC * MC);
-        packMatrixA(&alpha(c, b), rsA, csA, packedA);
+        double* packedA = calloc(KC * MC, sizeof(double));
+        packMatrixA(&alpha(c, b), rsA, csA, packedA, m);
         innerloop(MC, NC, KC, packedA, rsA, csA, packedB, rsB, csB, &gamma(c, a), rsC, csC );
         free(packedA);
       }

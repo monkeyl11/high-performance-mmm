@@ -19,10 +19,10 @@ int roundUp(int lcm, int n) {
   return n;
 }
 
-void padMatrix(double* M, double** newMat, int r, int c, int lcm) {
+void padMatrix(double* M, double** newMat, int r, int c, int rAlign, int cAlign) {
 
-  int dimR = roundUp(lcm, r);
-  int dimC = roundUp(lcm, c);
+  int dimR = roundUp(rAlign, r);
+  int dimC = roundUp(cAlign, c);
   *newMat = calloc(dimR * dimC, sizeof(double));
   for (int i = 0; i < c; i++) {
     for (int j = 0; j < r; j++) {
@@ -33,9 +33,9 @@ void padMatrix(double* M, double** newMat, int r, int c, int lcm) {
   //printMat(*newMat, dimR, dimC);
 }
 
-void copyBack(double* orig, double* padded, int r, int c, int lcm) {
-  int dimR = roundUp(lcm, r);
-  int dimC = roundUp(lcm, c);
+void copyBack(double* orig, double* padded, int r, int c, int rAlign, int cAlign) {
+  int dimR = roundUp(rAlign, r);
+  int dimC = roundUp(cAlign, c);
   for (int i = 0; i < c; i++) {
     for (int j = 0; j < r; j++) {
       orig[j + i * r] = padded[j + i * dimR];
@@ -55,22 +55,25 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   char padA = 0; char padB = 0; char padC = 0;
 
 
+ // printMat(A, m, k);
+  //printf("\n\n\n\n\n");
   if (m % lcm != 0 || k % lcm != 0) {
-    padMatrix(A, &APad, m, k, lcm);
+    padMatrix(A, &APad, m, k, MC, KC);
+    //printMat(APad, roundUp(lcm, m), roundUp(lcm, k));
     padA = 1;
   }
   else {
     APad = A;
   }
   if (n % lcm != 0 || k % lcm != 0) {
-    padMatrix(B, &BPad, k, n, lcm);
+    padMatrix(B, &BPad, k, n, KC, NC);
     padB = 1;
   }
   else {
     BPad = B;
   }
   if (m % lcm != 0 || n % lcm != 0) {
-    padMatrix(C, &CPad, m, n, lcm);
+    padMatrix(C, &CPad, m, n, MC, NC);
     padC = 1;
   }
   else {
@@ -86,20 +89,9 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   if (!(padA || padB || padC))
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
   else {
-    //printf("new m: %d\n", roundUp(lcm, m));
-    //printf("new n: %d\n", roundUp(lcm, n));
-    //printf("new k: %d\n", roundUp(lcm, k));
-
-    // printf("\n");
-    // printMat(APad, roundUp(lcm, m), roundUp(lcm, k));
-    // printf("\n\n\n\n");
-    // printMat(BPad, roundUp(lcm, k), roundUp(lcm, n));
-    // printf("\n");
     fiveloops( roundUp(lcm, m), roundUp(lcm, n), roundUp(lcm, k), 
                   APad, rsA, roundUp(lcm, csA), BPad, rsB, roundUp(lcm, csB), CPad, rsC, roundUp(lcm, csC));
   }
-
-
   if (padA) {
     //copyBack(A, APad, m, k, lcm);
     free(APad);
@@ -109,7 +101,7 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
     free(BPad);
   }
   if (padC) {
-    copyBack(C, CPad, m, n, lcm);
+    copyBack(C, CPad, m, n, MC, NC);
     free(CPad);
   }
 

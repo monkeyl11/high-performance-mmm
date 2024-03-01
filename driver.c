@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
 	n_input = -1;
 	k_input = -1;
 
-	nrepeats = 1;
+	nrepeats = 3;
 	p_begin = 48;
-	p_end   = 48;
+	p_end   = 960;
 	p_inc   = 48;
 
 	/* Adjust first and last so that they are multiples of inc */

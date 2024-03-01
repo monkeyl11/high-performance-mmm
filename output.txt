@@ -1,8 +1,5 @@
-% Sweeping over matrix sizes:  48 48 48 
+% Sweeping over matrix sizes:  48 960 48 
 data = [
 %   m     n     k         reference      |         current implementation 
 %                    time       GFLOPS   |    time       GFLOPS     diff 
-    48    48    60 7.5611e-03 3.6566e-02    5.1973e-05 5.3197e+00 7.1054e-15 
-];
-
-% Maximum difference between reference and your implementation: 7.105427e-15.
+    33    65    60 1.2037e-02 2.1384e-02   

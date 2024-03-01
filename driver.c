@@ -6,29 +6,6 @@
 
 int main(int argc, char *argv[])
 {
-	// double testMatrix[2304];
-	// for (int i = 0; i < 2304; i++) {
-	// 	testMatrix[i] = (double)i;
-	// }
-	// double* b = NULL;
-	// b = calloc(2304, sizeof(double));
-	// for (int i = 0; i < 2304; i++) {
-	// 	b[i] = i;
-	// }
-	// printMat(b, 48, 48);
-	// printf("\n\n\n\n\n");
-	// double* newMat = malloc(2304 * sizeof(double));
-	// packMatrixB(b, 1, 48, newMat);
-	// printMat(newMat, 48, 48);
-
-
-	// double* c = calloc(2304, sizeof(double));
-	// fiveloops(48,48,48, testMatrix, 1, 48, 
-	//      b, 1, 48, c, 1, 48 );
-	// exit(1);
-
-
-
 	int m, n, k;
 	int m_input, n_input, k_input;
 	int rsA, rsB, rsC;

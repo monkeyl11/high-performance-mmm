@@ -70,8 +70,6 @@ void ukernel_old( int m, int n, int k, double *A, int rsA, int csA,
 
 }
 
-
-
 void innerloop_old( int m, int n, int k, double *A, int rsA, int csA, 
 	     double *B, int rsB, int csB, double *C, int rsC, int csC) 
 {
@@ -223,15 +221,15 @@ void fiveloops( int m, int n, int k, double *A, int rsA, int csA,
 {
   for (int a = 0; a < n; a += NC) {
     for (int b = 0; b < k; b += KC) {
-      //double* packedB = malloc(sizeof(double) * KC * NC);
-      //packMatrixB(&beta(b, a), rsB, csB, packedB);
+      double* packedB = malloc(sizeof(double) * KC * NC);
+      packMatrixB(&beta(b, a), rsB, csB, packedB);
       for (int c = 0; c < m; c += MC) {
-        //double* packedA = malloc(sizeof(double) * KC * MC);
-        //packMatrixA(&alpha(c, b), rsA, csA, packedA);
-        innerloop_old(MC, NC, KC, &alpha(c, b), rsA, csA, &beta(b, a), rsB, csB, &gamma(c, a), rsC, csC );
-        //free(packedA);
+        double* packedA = malloc(sizeof(double) * KC * MC);
+        packMatrixA(&alpha(c, b), rsA, csA, packedA);
+        innerloop(MC, NC, KC, packedA, rsA, csA, packedB, rsB, csB, &gamma(c, a), rsC, csC );
+        free(packedA);
       }
-      //free(packedB);
+      free(packedB);
     }
   }
 }
@@ -240,10 +238,19 @@ void fiveloops( int m, int n, int k, double *A, int rsA, int csA,
 void printMat(double* x, int r, int c) {
   for (int i = 0; i < r; i++) {
     for (int j = 0; j < c; j++) {
-      printf("%d ", (int)(10*x[j * r + i]));
+      printf("%f ", (x[j * r + i]));
     }
     printf("\n");
   }
+}
+
+//helper method for debugging padding
+double sumMat(double* mat, int size) {
+  double total = 0;
+  for (int i = 0; i < size; i++) {
+    total += mat[i];
+  }
+  return total;
 }
 
 

@@ -1,5 +1,6 @@
 
 #include "project.h"
+#include <math.h>
 
 
 
@@ -11,40 +12,47 @@ int lcm_() {
   return i;
 }
 
+int roundUp(int lcm, int n) {
+  if (n % lcm != 0) {
+    return n + lcm - (n % lcm);
+  }
+  return n;
+}
+
 void padMatrix(double* M, double** newMat, int r, int c, int lcm) {
-  int dimR = ((r / lcm) + 1) * lcm;
-  int dimC = ((c / lcm) + 1) * lcm;
+
+  int dimR = roundUp(lcm, r);
+  int dimC = roundUp(lcm, c);
   *newMat = calloc(dimR * dimC, sizeof(double));
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < c; j++) {
-      (*newMat)[i * dimC + j] = M[i * c + j];
+  for (int i = 0; i < c; i++) {
+    for (int j = 0; j < r; j++) {
+      (*newMat)[j + i * dimR] = M[j + i * r];
     }
   }
+  //printf("\nPRINTING NEWMAT\n");
+  //printMat(*newMat, dimR, dimC);
 }
 
 void copyBack(double* orig, double* padded, int r, int c, int lcm) {
-  int dimR = ((r / lcm) + 1) * lcm;
-  int dimC = ((c / lcm) + 1) * lcm;
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < c; j++) {
-      orig[i * c + j] = padded[i * dimC + j];
+  int dimR = roundUp(lcm, r);
+  int dimC = roundUp(lcm, c);
+  for (int i = 0; i < c; i++) {
+    for (int j = 0; j < r; j++) {
+      orig[j + i * r] = padded[j + i * dimR];
     }
   }
 }
 
-int roundUp(int lcm, int n) {
-  return ((n / lcm) + 1) * lcm;
-}
+
 
 void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
 	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
 {
 
   int lcm = lcm_();
+  //printf("LCM: %d\n", lcm);
   double* APad = NULL; double* BPad = NULL; double* CPad = NULL;
   char padA = 0; char padB = 0; char padC = 0;
-
-
 
 
   if (m % lcm != 0 || k % lcm != 0) {
@@ -78,6 +86,15 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   if (!(padA || padB || padC))
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
   else {
+    //printf("new m: %d\n", roundUp(lcm, m));
+    //printf("new n: %d\n", roundUp(lcm, n));
+    //printf("new k: %d\n", roundUp(lcm, k));
+
+    // printf("\n");
+    // printMat(APad, roundUp(lcm, m), roundUp(lcm, k));
+    // printf("\n\n\n\n");
+    // printMat(BPad, roundUp(lcm, k), roundUp(lcm, n));
+    // printf("\n");
     fiveloops( roundUp(lcm, m), roundUp(lcm, n), roundUp(lcm, k), 
                   APad, rsA, roundUp(lcm, csA), BPad, rsB, roundUp(lcm, csB), CPad, rsC, roundUp(lcm, csC));
   }

@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
 	n_input = -1;
 	k_input = -1;
 
-	nrepeats = NREPEATS;
-	p_begin = P_BEGIN;
-	p_end   = P_END;
-	p_inc   = P_INC;
+	nrepeats = 1;
+	p_begin = 48;
+	p_end   = 48;
+	p_inc   = 48;
 
 	/* Adjust first and last so that they are multiples of inc */
 	printf( "%% Sweeping over matrix sizes:  %d %d %d \n", p_begin, p_end, p_inc );
@@ -48,6 +48,11 @@ int main(int argc, char *argv[])
 		else               n =     ( dim_t )    n_input;
 		if ( k_input < 0 ) k = p / ( dim_t )abs(k_input);
 		else               k =     ( dim_t )    k_input;
+
+		k += 12;
+		m -= 15;
+		n += 17;
+
 
 		csA = m;
 		csB = k;

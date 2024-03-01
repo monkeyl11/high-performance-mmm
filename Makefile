@@ -10,7 +10,7 @@ BLIS_INC  := $(HOME)/blis/include/blis
 # indicate how the object files are to be created
 CC         := gcc
 LINKER     := $(CC)
-CFLAGS     := -g -I$(BLIS_INC) -m64 -mavx2 -std=c99 -march=native -fopenmp -D_POSIX_C_SOURCE=200809L
+CFLAGS     := -O3 -g -I$(BLIS_INC) -m64 -mavx2 -std=c99 -march=native -fopenmp -D_POSIX_C_SOURCE=200809L
 FFLAGS     := $(CFLAGS) 
 
 PSIZE := -DNREPEATS=3   \

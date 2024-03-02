@@ -19,16 +19,19 @@ int roundUp(int lcm, int n) {
   return n;
 }
 
-void padMatrix(double* M, double** newMat, int r, int c, int rAlign, int cAlign) {
+int padMatrix(double* M, double** newMat, int r, int c, int rAlign, int cAlign) {
 
   int dimR = roundUp(rAlign, r);
   int dimC = roundUp(cAlign, c);
+  if (dimR == r && dimC == c)
+    return 0;
   *newMat = calloc(dimR * dimC, sizeof(double));
   for (int i = 0; i < c; i++) {
     for (int j = 0; j < r; j++) {
       (*newMat)[j + i * dimR] = M[j + i * r];
     }
   }
+  return 1;
   //printf("\nPRINTING NEWMAT\n");
   //printMat(*newMat, dimR, dimC);
 }
@@ -57,23 +60,19 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
 
  // printMat(A, m, k);
   //printf("\n\n\n\n\n");
-  if (m % lcm != 0 || k % lcm != 0) {
-    padMatrix(A, &APad, m, k, MC, KC);
-    //printMat(APad, roundUp(lcm, m), roundUp(lcm, k));
+  if (padMatrix(A, &APad, m, k, MC, KC)) {
     padA = 1;
   }
   else {
     APad = A;
   }
-  if (n % lcm != 0 || k % lcm != 0) {
-    padMatrix(B, &BPad, k, n, KC, NC);
+  if (padMatrix(B, &BPad, k, n, KC, NC)) {
     padB = 1;
   }
   else {
     BPad = B;
   }
-  if (m % lcm != 0 || n % lcm != 0) {
-    padMatrix(C, &CPad, m, n, MC, NC);
+  if (padMatrix(C, &CPad, m, n, MC, NC)) {
     padC = 1;
   }
   else {

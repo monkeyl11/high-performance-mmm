@@ -3,9 +3,9 @@
 
 #define MR 8
 #define NR 6
-#define MC 240
-#define NC 960
-#define KC 240
+#define MC 144
+#define NC 216
+#define KC 216
 
 /*
   Any #define or function declaration must be provided in this header.

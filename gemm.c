@@ -88,8 +88,8 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   if (!(padA || padB || padC))
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
   else {
-    fiveloops( roundUp(lcm, m), roundUp(lcm, n), roundUp(lcm, k), 
-                  APad, rsA, roundUp(lcm, csA), BPad, rsB, roundUp(lcm, csB), CPad, rsC, roundUp(lcm, csC));
+    fiveloops( roundUp(MC, m), roundUp(NC, n), roundUp(KC, k), 
+                  APad, rsA, roundUp(MC, csA), BPad, rsB, roundUp(KC, csB), CPad, rsC, roundUp(MC, csC));
   }
   if (padA) {
     //copyBack(A, APad, m, k, lcm);

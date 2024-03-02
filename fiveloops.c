@@ -196,13 +196,16 @@ void ukernel( int m, int n, int k, double *A, int rsA, int csA,
 //packing MCxKC matrix
 void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m) {
     for (int i = 0; i < KC * MC; i++) {
-      newMatrix[i] = A[(i % MR) * rsA + csA * ((int)(i / MR) % KC) + (MR * (int)(i / (MR * KC))) * rsA];
+      newMatrix[i] = A[(i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC))];
     }
+  
 }
 
 //NCxKC
 void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n) {
+
   for (int i = 0; i < KC * NC; i++) {
+
       newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
     }
 }

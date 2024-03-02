@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
 	k_input = -1;
 
 	nrepeats = 3;
-	p_begin = 48;
-	p_end   = 960;
+	p_begin = 53;
+	p_end   = 480;
 	p_inc   = 48;
 
 	/* Adjust first and last so that they are multiples of inc */
@@ -49,9 +49,6 @@ int main(int argc, char *argv[])
 		if ( k_input < 0 ) k = p / ( dim_t )abs(k_input);
 		else               k =     ( dim_t )    k_input;
 
-		k += 12;
-		m -= 15;
-		n += 17;
 
 
 		csA = m;
@@ -84,6 +81,10 @@ int main(int argc, char *argv[])
 		Cold = ( double * ) malloc( csC * n * sizeof( double ) );
 		Cref = ( double * ) malloc( csC * n * sizeof( double ) );
 
+
+		m -= 5;
+		n -= 5;
+		k -= 5;
 		/* Generate random matrix A */
 		RandomMatrix( m, k, A, rsA, csA );
 

@@ -196,6 +196,7 @@ void ukernel( int m, int n, int k, double *A, int rsA, int csA,
 //packing MCxKC matrix
 void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m) {
     for (int i = 0; i < KC * MC; i++) {
+      //inBounds((i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC)), KC*MC);
       newMatrix[i] = A[(i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC))];
     }
   
@@ -205,7 +206,7 @@ void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m) {
 void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n) {
 
   for (int i = 0; i < KC * NC; i++) {
-
+      //inBounds((i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC)), KC*NC);
       newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
     }
 }
@@ -255,6 +256,13 @@ double sumMat(double* mat, int size) {
     total += mat[i];
   }
   return total;
+}
+
+void inBounds(int num, int max) {
+  if (num >= max && num < 0) {
+    printf("OUT OF BOUNDS FOR NUM %d UNDER MAX %d\n", num, max);
+    exit(1);
+  }
 }
 
 

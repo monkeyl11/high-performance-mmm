@@ -83,8 +83,9 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   //   printf("\n\n\n\n\n");
   // }
 
-  if (!(padA || padB || padC))
+  if (!(padA || padB || padC)) {
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
+  }
   else {
     fiveloops( roundUp(MR, m), roundUp(NR, n), roundUp(KC, k), 
                   APad, rsA, roundUp(MR, csA), BPad, rsB, roundUp(KC, csB), CPad, rsC, roundUp(MR, csC)); //MAY NEED TO FIX

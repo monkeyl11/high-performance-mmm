@@ -129,7 +129,7 @@ void innerloop_old( int m, int n, int k, double *A, int rsA, int csA,
 
 
 
-void ukernel( int m, int n, int k, double *A, int rsA, int csA, 
+void ukernel(int k, double *A, int rsA, int csA, 
 	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
 {
   __m256d gamma_0123_0, gamma_0123_1, gamma_0123_2, gamma_0123_3, gamma_0123_4, gamma_0123_5;
@@ -240,7 +240,7 @@ void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m) {
 void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n) {
 
   for (int i = 0; i < KC * n; i++) {
-      inBounds((i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC)), KC*n);
+      // inBounds((i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC)), KC*n);
       newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
     }
 }
@@ -251,7 +251,7 @@ void innerloop( int m, int n, int k, double *A, int rsA, int csA,
   for ( int j=0; j<n; j += NR )
     for ( int i=0; i<m; i += MR )
     {
-      ukernel(MR, NR, k, A + i * KC, rsA, csA, B + j * KC, rsB, csB, C + rsC * i + csC * j, rsC, csC );
+      ukernel(k, A + i * KC, rsA, csA, B + j * KC, rsB, csB, C + rsC * i + csC * j, rsC, csC );
     }
 }
 

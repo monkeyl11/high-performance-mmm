@@ -3,9 +3,10 @@
 
 #define MR 8
 #define NR 6
-#define MC 48
-#define NC 48
-#define KC 96
+#define MC 480
+#define NC 1440
+#define KC 48
+#include <time.h>
 
 /*
   Any #define or function declaration must be provided in this header.

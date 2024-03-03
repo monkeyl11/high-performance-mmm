@@ -58,19 +58,19 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
 
  // printMat(A, m, k);
   //printf("\n\n\n\n\n");
-  if (padMatrix(A, &APad, m, k, MC, KC, csA)) {
+  if (padMatrix(A, &APad, m, k, MR, KC, csA)) {
     padA = 1;
   }
   else {
     APad = A;
   }
-  if (padMatrix(B, &BPad, k, n, KC, NC, csB)) {
+  if (padMatrix(B, &BPad, k, n, KC, NR, csB)) {
     padB = 1;
   }
   else {
     BPad = B;
   }
-  if (padMatrix(C, &CPad, m, n, MC, NC, csC)) {
+  if (padMatrix(C, &CPad, m, n, MR, NR, csC)) {
     padC = 1;
   }
   else {
@@ -86,8 +86,8 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   if (!(padA || padB || padC))
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
   else {
-    fiveloops( roundUp(MC, m), roundUp(NC, n), roundUp(KC, k), 
-                  APad, rsA, roundUp(MC, csA), BPad, rsB, roundUp(KC, csB), CPad, rsC, roundUp(MC, csC));
+    fiveloops( roundUp(MR, m), roundUp(NR, n), roundUp(KC, k), 
+                  APad, rsA, roundUp(MR, csA), BPad, rsB, roundUp(KC, csB), CPad, rsC, roundUp(MR, csC)); //MAY NEED TO FIX
   }
   if (padA) {
     //copyBack(A, APad, m, k, lcm);
@@ -98,7 +98,7 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
     free(BPad);
   }
   if (padC) {
-    copyBack(C, CPad, m, n, MC, NC, csC);
+    copyBack(C, CPad, m, n, MR, NR, csC);
     free(CPad);
   }
 

@@ -50,13 +50,12 @@ int main(int argc, char *argv[])
 		else               k =     ( dim_t )    k_input;
 
 
-		// m -= 12;
-		// n += 17;
-		// k -= 10;
 
 		csA = m;
 		csB = k;
 		csC = m;
+
+
 
 		rsA = rsB = rsC = 1;
 		/* Gflops performed */

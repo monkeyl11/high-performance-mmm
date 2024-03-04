@@ -46,20 +46,24 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
 
  // printMat(A, m, k);
   //printf("\n\n\n\n\n");
+  int csC_original = csC;
   if (padMatrix(A, &APad, m, k, MR, KC, csA)) {
     padA = 1;
+    csA = roundUp(MR, m);
   }
   else {
     APad = A;
   }
   if (padMatrix(B, &BPad, k, n, KC, NR, csB)) {
     padB = 1;
+    csB = roundUp(KC, k);
   }
   else {
     BPad = B;
   }
   if (padMatrix(C, &CPad, m, n, MR, NR, csC)) {
     padC = 1;
+    csC = roundUp(MR, m);
   }
   else {
     CPad = C;
@@ -76,7 +80,7 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   }
   else {
     fiveloops( roundUp(MR, m), roundUp(NR, n), roundUp(KC, k), 
-                  APad, rsA, roundUp(MR, csA), BPad, rsB, roundUp(KC, csB), CPad, rsC, roundUp(MR, csC)); //MAY NEED TO FIX
+                  APad, rsA, csA, BPad, rsB, csB, CPad, rsC, csC); //MAY NEED TO FIX
   }
   if (padA) {
     //copyBack(A, APad, m, k, lcm);
@@ -87,7 +91,7 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
     free(BPad);
   }
   if (padC) {
-    copyBack(C, CPad, m, n, MR, NR, csC);
+    copyBack(C, CPad, m, n, MR, NR, csC_original);
     free(CPad);
   }
 

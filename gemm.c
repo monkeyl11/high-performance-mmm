@@ -3,15 +3,6 @@
 #include <math.h>
 
 
-
-int lcm_() {
-  int i = 1;
-  while (i % MR != 0 || i % NR != 0 || i % KC != 0) {
-    i++;
-  }
-  return i;
-}
-
 int roundUp(int lcm, int n) {
   if (n % lcm != 0) {
     return n + lcm - (n % lcm);
@@ -49,9 +40,6 @@ void copyBack(double* orig, double* padded, int r, int c, int rAlign, int cAlign
 void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
 	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
 {
-
-  int lcm = lcm_();
-  //printf("LCM: %d\n", lcm);
   double* APad = NULL; double* BPad = NULL; double* CPad = NULL;
   char padA = 0; char padB = 0; char padC = 0;
 

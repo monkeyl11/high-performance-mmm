@@ -3,9 +3,9 @@
 
 #define MR 8
 #define NR 6
-#define MC 480
+#define MC 72
 #define NC 1440
-#define KC 48
+#define KC 256
 #include <time.h>
 
 /*

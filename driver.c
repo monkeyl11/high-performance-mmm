@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
 	k_input = -1;
 
 	nrepeats = 3;
-	p_begin = 48;
+	p_begin = 90;
 	p_end   = 960;
-	p_inc   = 48;
+	p_inc   = 47;
 
 	/* Adjust first and last so that they are multiples of inc */
 	printf( "%% Sweeping over matrix sizes:  %d %d %d \n", p_begin, p_end, p_inc );
@@ -51,9 +51,15 @@ int main(int argc, char *argv[])
 
 
 
+
 		csA = m;
 		csB = k;
 		csC = m;
+
+		m -= 58;
+		n -= 12;
+		k -= 89;
+		
 
 
 

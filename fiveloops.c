@@ -108,51 +108,107 @@ void ukernel(int k, double *A, int rsA, int csA,
 }
 
 //packing MCxKC matrix
-void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m, int k) {
-    for (int i = 0; i < KC * m; i++) {
+void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m, int k, int kcmin) {
+  int i = 0;
+    while (i < KC * m) {
       //inBounds((i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC)), KC*MC);
-      newMatrix[i] = A[(i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC))];
+      if ((i / MR) % KC >= kcmin)
+        newMatrix[i] = 0;
+      else
+        newMatrix[i] = A[(i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC))];
+      i++;
     }
-  
+    while (i < KC * MC) {
+      newMatrix[i] = 0;
+      i++;
+    }
 }
 
 //NCxKC
-void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n, int k) {
+void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n, int k, int kcmin, int b, int maxN, int a) {
 
-  for (int i = 0; i < KC * n; i++) {
+  int i = 0;
+  while (i < KC * n) {
       // inBounds((i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC)), KC*n);
-      newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
+      if ((i / NR) % KC >= kcmin)
+        newMatrix[i] = 0;
+      else {
+        // if ((i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC)) + csB * a + b >= maxN * k){
+        //   printf("%d\n", (i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC)) + csB * a + b);
+        // //if (a + i % NR + NR * (i / (NR * KC)) >= maxN)
+        // printf("%d\n", a + i % NR + NR * (i / (NR * KC)));
+        // //if (b + ((i / NR)) % KC >= k)
+        // printf("%d\n", b + ((i / NR)) % KC);
+        // }
+
+        newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
+      }
+      i++;
     }
+  while (i < KC * NC) {
+    newMatrix[i] = 0;
+    i++;
+  }
+}
+
+int padMat(double* C, double* cTemp, int r, int c, int csC) {
+
+  for (int i = 0; i < c; i++) {
+    for (int j = 0; j < r; j++) {
+      cTemp[j + i * MR] = C[j + i * csC];
+    }
+  }
+  return 1;
+}
+
+int copyB(double* C, double* cTemp, int r, int c, int csC) {
+    for (int i = 0; i < c; i++) {
+      for (int j = 0; j < r; j++) {
+        C[j + i * csC] = cTemp[j + i * MR];
+      }
+    }
+    return 1;
 }
 
 void innerloop( int m, int n, int k, double *A, int rsA, int csA, 
-	     double *B, int rsB, int csB, double *C, int rsC, int csC) 
+	     double *B, int rsB, int csB, double *C, int rsC, int csC, double* cTemp) 
 {
   for ( int j=0; j<n; j += NR )
     for ( int i=0; i<m; i += MR )
     {
-      ukernel(k, A + i * KC, rsA, csA, B + j * KC, rsB, csB, C + rsC * i + csC * j, rsC, csC );
+      if ((j + NR > n) || (i + MR > m)) {
+          double* cTemp = calloc(MR * NR, sizeof(double));
+          padMat(C, cTemp, m - i, n - j, csC);
+          ukernel(k, A + i * KC, rsA, csA, B + j * KC, rsB, csB, C + rsC * i + csC * j, rsC, csC ); //cTemp???
+          copyB(C, cTemp, m - i, n - j, csC);
+          free(cTemp);
+      }
+      else
+        ukernel(k, A + i * KC, rsA, csA, B + j * KC, rsB, csB, C + rsC * i + csC * j, rsC, csC );
     }
 }
 
 void fiveloops( int m, int n, int k, double *A, int rsA, int csA, 
 	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
 {
+
+  double* packedB = NULL;
+  double* packedA = NULL;
+  double* cTemp = NULL;
+  packedB = malloc(KC * NC * sizeof(double));
+  packedA = malloc(KC * MC * sizeof(double));
   for (int a = 0; a < n; a += NC) {
     for (int b = 0; b < k; b += KC) {
-      double* packedB = NULL;
-        packedB = malloc(KC * NCMIN * sizeof(double));
-      packMatrixB(&beta(b, a), rsB, csB, packedB, NCMIN, KCMIN);
+      packMatrixB(&beta(b, a), rsB, csB, packedB, NCMIN, k, KCMIN, b, n, a);
       for (int c = 0; c < m; c += MC) {
-        double* packedA = NULL;
-          packedA = malloc(KC * MCMIN * sizeof(double));
-        packMatrixA(&alpha(c, b), rsA, csA, packedA, MCMIN, KCMIN);
-        innerloop(MCMIN, NCMIN, KC, packedA, rsA, csA, packedB, rsB, csB, &gamma(c, a), rsC, csC );
-        free(packedA);
+        packMatrixA(&alpha(c, b), rsA, csA, packedA, MCMIN, k, KCMIN);
+        innerloop(MCMIN, NCMIN, KC, packedA, rsA, csA, packedB, rsB, csB, &gamma(c, a), rsC, csC, cTemp);
       }
-      free(packedB);
     }
   }
+  free(packedA);
+  free(packedB);
+
 }
 
 //helper method, prints a matrix
@@ -174,11 +230,12 @@ double sumMat(double* mat, int size) {
   return total;
 }
 
-void inBounds(int num, int max) {
+int inBounds(int num, int max) {
   if (num >= max && num < 0) {
     printf("OUT OF BOUNDS FOR NUM %d UNDER MAX %d\n", num, max);
-    exit(1);
+    return 0;
   }
+  return 1;
 }
 
 

@@ -35,6 +35,10 @@ void copyBack(double* orig, double* padded, int r, int c, int rAlign, int cAlign
   }
 }
 
+void transposeMat(double* mat, int r, int c) {
+  //to do for row-ordered matries
+}
+
 
 
 void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
@@ -44,19 +48,17 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
   char padA = 0; char padB = 0; char padC = 0;
 
 
- // printMat(A, m, k);
-  //printf("\n\n\n\n\n");
   int csC_original = csC;
-  if (padMatrix(A, &APad, m, k, MR, KC, csA)) {
+  if (padMatrix(A, &APad, m, k, MR, 1, csA)) {
     padA = 1;
     csA = roundUp(MR, m);
   }
   else {
     APad = A;
   }
-  if (padMatrix(B, &BPad, k, n, KC, NR, csB)) {
+  if (padMatrix(B, &BPad, k, n, 1, NR, csB)) {
     padB = 1;
-    csB = roundUp(KC, k);
+    csB = k;
   }
   else {
     BPad = B;
@@ -79,7 +81,7 @@ void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
   }
   else {
-    fiveloops( roundUp(MR, m), roundUp(NR, n), roundUp(KC, k), 
+    fiveloops( roundUp(MR, m), roundUp(NR, n), k, 
                   APad, rsA, csA, BPad, rsB, csB, CPad, rsC, csC); //MAY NEED TO FIX
   }
   if (padA) {

@@ -263,17 +263,11 @@ void fiveloops( int m, int n, int k, double *A, int rsA, int csA,
   for (int a = 0; a < n; a += NC) {
     for (int b = 0; b < k; b += KC) {
       double* packedB = NULL;
-      if (KCMIN == KC)
         packedB = malloc(KC * NCMIN * sizeof(double));
-      else
-        packedB = calloc(sizeof(double), KC * NCMIN);
       packMatrixB(&beta(b, a), rsB, csB, packedB, NCMIN, KCMIN);
       for (int c = 0; c < m; c += MC) {
         double* packedA = NULL;
-        if (KCMIN == KC)
           packedA = malloc(KC * MCMIN * sizeof(double));
-        else
-          packedA = calloc(sizeof(double), KC * MCMIN);
         packMatrixA(&alpha(c, b), rsA, csA, packedA, MCMIN, KCMIN);
         innerloop(MCMIN, NCMIN, KC, packedA, rsA, csA, packedB, rsB, csB, &gamma(c, a), rsC, csC );
         free(packedA);

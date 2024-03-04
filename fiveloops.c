@@ -270,6 +270,7 @@ void fiveloops( int m, int n, int k, double *A, int rsA, int csA,
       packMatrixB(&beta(b, a), rsB, csB, packedB, NCMIN, KCMIN);
       for (int c = 0; c < m; c += MC) {
         double* packedA = NULL;
+        if (KCMIN == KC)
           packedA = malloc(KC * MCMIN * sizeof(double));
         else
           packedA = calloc(sizeof(double), KC * MCMIN);

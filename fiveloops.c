@@ -7,6 +7,8 @@
 
 #define MCMIN ((m - c > MC) ? MC : (m - c))
 #define NCMIN ((n - a > NC) ? NC : (n - a))
+#define KCMIN ((k - b > KC) ? KC : (k - b))
+
 
 void ukernel_old( int m, int n, int k, double *A, int rsA, int csA, 
 	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
@@ -152,7 +154,7 @@ void ukernel(int k, double *A, int rsA, int csA,
   gamma_0123_51 = _mm256_loadu_pd( &gamma(DOUBLES_STORED_IN_REG, 5) ) ;
 
 
-  for ( int p=0; p < k; p+=2){
+  for ( int p=0; p < k; p+=2){ //PAD KC FOR MULTIPLES OF 2!!!!!!
     alpha_0123_p = _mm256_loadu_pd( &alpha(p * MR, 0) ) ;
     alpha_0123_p1 = _mm256_loadu_pd( &alpha(p * MR + DOUBLES_STORED_IN_REG, 0) ) ;
 
@@ -228,8 +230,8 @@ void ukernel(int k, double *A, int rsA, int csA,
 }
 
 //packing MCxKC matrix
-void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m) {
-    for (int i = 0; i < KC * m; i++) {
+void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m, int k) {
+    for (int i = 0; i < k * m; i++) {
       //inBounds((i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC)), KC*MC);
       newMatrix[i] = A[(i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC))];
     }
@@ -237,9 +239,9 @@ void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m) {
 }
 
 //NCxKC
-void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n) {
+void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n, int k) {
 
-  for (int i = 0; i < KC * n; i++) {
+  for (int i = 0; i < k * n; i++) {
       // inBounds((i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC)), KC*n);
       newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
     }
@@ -260,11 +262,18 @@ void fiveloops( int m, int n, int k, double *A, int rsA, int csA,
 {
   for (int a = 0; a < n; a += NC) {
     for (int b = 0; b < k; b += KC) {
-      double* packedB = malloc(KC * NCMIN * sizeof(double));
-      packMatrixB(&beta(b, a), rsB, csB, packedB, NCMIN);
+      double* packedB = NULL;
+      if (KCMIN == KC)
+        packedB = malloc(KC * NCMIN * sizeof(double));
+      else
+        packedB = calloc(sizeof(double), KC * NCMIN);
+      packMatrixB(&beta(b, a), rsB, csB, packedB, NCMIN, KCMIN);
       for (int c = 0; c < m; c += MC) {
-        double* packedA = malloc(KC * MCMIN * sizeof(double));
-        packMatrixA(&alpha(c, b), rsA, csA, packedA, MCMIN);
+        double* packedA = NULL;
+          packedA = malloc(KC * MCMIN * sizeof(double));
+        else
+          packedA = calloc(sizeof(double), KC * MCMIN);
+        packMatrixA(&alpha(c, b), rsA, csA, packedA, MCMIN, KCMIN);
         innerloop(MCMIN, NCMIN, KC, packedA, rsA, csA, packedB, rsB, csB, &gamma(c, a), rsC, csC );
         free(packedA);
       }

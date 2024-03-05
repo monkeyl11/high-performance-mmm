@@ -6,7 +6,6 @@
 #define MC 72
 #define NC 1440
 #define KC 256
-#include <time.h>
 
 /*
   Any #define or function declaration must be provided in this header.

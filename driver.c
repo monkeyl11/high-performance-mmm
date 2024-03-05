@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
 	k_input = -1;
 
 	nrepeats = 3;
-	p_begin = 90;
+	p_begin = 48;
 	p_end   = 960;
-	p_inc   = 47;
+	p_inc   = 48;
 
 	/* Adjust first and last so that they are multiples of inc */
 	printf( "%% Sweeping over matrix sizes:  %d %d %d \n", p_begin, p_end, p_inc );
@@ -50,18 +50,13 @@ int main(int argc, char *argv[])
 		else               k =     ( dim_t )    k_input;
 
 
-
+		// m -= 12;
+		// n += 17;
+		// k -= 10;
 
 		csA = m;
 		csB = k;
 		csC = m;
-
-		m -= 58;
-		n -= 12;
-		k -= 89;
-		
-
-
 
 		rsA = rsB = rsC = 1;
 		/* Gflops performed */

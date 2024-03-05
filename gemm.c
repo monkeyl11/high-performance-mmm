@@ -10,33 +10,41 @@ int roundUp(int lcm, int n) {
   return n;
 }
 
-int padMatrix(double* M, double** newMat, int r, int c, int rAlign, int cAlign, int colStride) {
+// int padMatrix(double* M, double** newMat, int r, int c, int rAlign, int cAlign, int colStride) {
 
-  int dimR = roundUp(rAlign, r);
-  int dimC = roundUp(cAlign, c);
-  if (dimR == r && dimC == c)
-    return 0;
-  *newMat = calloc(dimR * dimC, sizeof(double));
-  for (int i = 0; i < c; i++) {
-    for (int j = 0; j < r; j++) {
-      (*newMat)[j + i * dimR] = M[j + i * colStride];
-    }
-  }
-  return 1;
-}
+//   int dimR = roundUp(rAlign, r);
+//   int dimC = roundUp(cAlign, c);
+//   if (dimR == r && dimC == c)
+//     return 0;
+//   *newMat = calloc(dimR * dimC, sizeof(double));
+//   for (int i = 0; i < c; i++) {
+//     for (int j = 0; j < r; j++) {
+//       (*newMat)[j + i * dimR] = M[j + i * colStride];
+//     }
+//   }
+//   return 1;
+// }
 
-void copyBack(double* orig, double* padded, int r, int c, int rAlign, int cAlign, int colStride) {
-  int dimR = roundUp(rAlign, r);
-  int dimC = roundUp(cAlign, c);
-  for (int i = 0; i < c; i++) {
-    for (int j = 0; j < r; j++) {
-      orig[j + i * colStride] = padded[j + i * dimR];
-    }
-  }
-}
+// void copyBack(double* orig, double* padded, int r, int c, int rAlign, int cAlign, int colStride) {
+//   int dimR = roundUp(rAlign, r);
+//   int dimC = roundUp(cAlign, c);
+//   for (int i = 0; i < c; i++) {
+//     for (int j = 0; j < r; j++) {
+//       orig[j + i * colStride] = padded[j + i * dimR];
+//     }
+//   }
+// }
 
 void transposeMat(double* mat, int r, int c) {
   //to do for row-ordered matries
+  int temp = 0;
+  for (int i = 0; i < r; i++) {
+    for (int j = 0; j < c; j++) {
+      temp = mat[i * c + j];
+      mat[i * c + j] = mat[j * r + i];
+      mat[j * r + i] = temp;
+    }
+  }
 }
 
 
@@ -44,59 +52,16 @@ void transposeMat(double* mat, int r, int c) {
 void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
 	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
 {
-  double* APad = NULL; double* BPad = NULL; double* CPad = NULL;
-  char padA = 0; char padB = 0; char padC = 0;
-
-
-  int csC_original = csC;
-  if (padMatrix(A, &APad, m, k, MR, 1, csA)) {
-    padA = 1;
-    csA = roundUp(MR, m);
+  //Assume row-stored for all matrices if C is row-stored
+  if (rsC != 1 && csC == 1) {
+    transposeMat(A, m, k);
+    transposeMat(B, k, n);
+    transposeMat(C, m, n);
+    fiveloops( n, m, k, B, csB, rsB, A, csA, rsA, C, csC, rsC);
+    transposeMat(C, n, m);
   }
-  else {
-    APad = A;
-  }
-  if (padMatrix(B, &BPad, k, n, 1, NR, csB)) {
-    padB = 1;
-    csB = k;
-  }
-  else {
-    BPad = B;
-  }
-  if (padMatrix(C, &CPad, m, n, MR, NR, csC)) {
-    padC = 1;
-    csC = roundUp(MR, m);
-  }
-  else {
-    CPad = C;
-  }
-
-  // if (padA && m < 96) {
-  //   printf("\n\n\n\n\n");
-  //   printMat(CPad, 96, 96);
-  //   printf("\n\n\n\n\n");
-  // }
-
-  if (!(padA || padB || padC)) {
+  else
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
-  }
-  else {
-    fiveloops( roundUp(MR, m), roundUp(NR, n), k, 
-                  APad, rsA, csA, BPad, rsB, csB, CPad, rsC, csC); //MAY NEED TO FIX
-  }
-  if (padA) {
-    //copyBack(A, APad, m, k, lcm);
-    free(APad);
-  }
-  if (padB) {
-    //copyBack(B, BPad, k, n, lcm);
-    free(BPad);
-  }
-  if (padC) {
-    copyBack(C, CPad, m, n, MR, NR, csC_original);
-    free(CPad);
-  }
-
 }
 
 // void MyGemm2( int m, int n, int k, double *A, int rsA, int csA,

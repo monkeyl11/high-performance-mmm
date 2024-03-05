@@ -35,48 +35,39 @@ int roundUp(int lcm, int n) {
 //   }
 // }
 
-void transposeMat(double* mat, int r, int c) {
+void transposeMat(double** mat, int r, int c) {
   //to do for row-ordered matries
-  int temp = 0;
+  double temp = 0;
+  double* newMat = malloc(r * c * sizeof(double));
   for (int i = 0; i < r; i++) {
     for (int j = 0; j < c; j++) {
-      temp = mat[i * c + j];
-      mat[i * c + j] = mat[j * r + i];
-      mat[j * r + i] = temp;
+      newMat[i * c + j] = (*mat)[j * r + i];
     }
   }
+  free(*mat);
+  *mat = newMat;
 }
 
 
 
 void MyGemm( int m, int n, int k, double *A, int rsA, int csA,
-	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
+	     double *B, int rsB, int csB, double *C, int rsC, int csC )
 {
   //Assume row-stored for all matrices if C is row-stored
   if (rsC != 1 && csC == 1) {
-    transposeMat(A, m, k);
-    transposeMat(B, k, n);
-    transposeMat(C, m, n);
-    fiveloops( n, m, k, B, csB, rsB, A, csA, rsA, C, csC, rsC);
-    transposeMat(C, n, m);
+    // transposeMat(A, m, k);
+    // transposeMat(B, k, n);
+    // transposeMat(C, m, n);
+    double* CTemp = calloc(m * n, sizeof(double));
+    fiveloops( n, m, k, B, csB, rsB, A, csA, rsA, CTemp, csC, n);
+    for (int i = 0; i < m * n; i++) {
+      C[(i / m) * rsC + i % m] += CTemp[i];
+    }
+    free(CTemp);
+    // printf("\n\n\n\n");
+    // printMat(C, 4, 4);
+    //transposeMat(&C, m, n, rsC);
   }
   else
     fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
 }
-
-// void MyGemm2( int m, int n, int k, double *A, int rsA, int csA,
-// 	     double *B, int rsB, int csB,  double *C, int rsC, int csC )
-// {
-//     printf("\n\n\n\n\n");
-//     printMat(C, 48, 48);
-//     printf("\n\n\n\n\n");
-//   fiveloops( m, n, k, A, rsA, csA, B, rsB, csB, C, rsC, csC);
-//     printf("\n\n\n\n\n");
-//     printMat(C, 48, 48);
-//     printf("\n\n\n\n\n");
-// }
-
-
-
-
-  

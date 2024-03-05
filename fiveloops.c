@@ -122,8 +122,9 @@ void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m, int k, i
 //NCxKC
 void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n, int k, int kcmin) {
   memset(newMatrix, 0, KC * NC * sizeof(double));
+  int nRounded = roundUp(NR, n);
   int i = 0;
-  while (i < KC * n) {
+  while (i < KC * nRounded) {
       if ((i / NR) % KC < kcmin && i % NR + NR * (i / (NR * KC)) < n)
         newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
       i ++;

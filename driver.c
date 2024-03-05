@@ -20,6 +20,27 @@ int main(int argc, char *argv[])
 
 	double *A, *B, *C, *Cold, *Cref;
 
+	double* a = malloc(128);
+	double* b = malloc(128);
+	double* c = malloc(128);
+	for (int i = 0; i < 16; i++) {
+		a[i] = i + 1;
+		b[i] = i + 5;
+		c[i] = 1;
+	}
+	//printMat(a, 4, 4);
+	// printf("\n\n\n\n");
+	// printMat(b, 4, 4);
+	// bli_dgemm( BLIS_NO_TRANSPOSE, BLIS_NO_TRANSPOSE,  
+	// 				2, 3, 2, &d_one, 
+	// 				a, 4, 1, 
+	// 				b, 4, 1, &d_one, 
+	// 				c, 4, 1 );
+	MyGemm(2, 3, 2, a, 4, 1, b, 4, 1, c, 4, 1);
+	printf("\n\n\n\n");
+	printMat(c, 4, 4);
+	exit(0);
+
 
 	m_input = -1;
 	n_input = -1;
@@ -27,7 +48,7 @@ int main(int argc, char *argv[])
 
 	nrepeats = 3;
 	p_begin = 100;
-	p_end   = 960;
+	p_end   = 100;
 	p_inc   = 100;
 
 	/* Adjust first and last so that they are multiples of inc */

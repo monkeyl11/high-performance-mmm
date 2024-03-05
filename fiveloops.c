@@ -115,7 +115,7 @@ void packMatrixA(double *A, int rsA, int csA, double* newMatrix, int m, int k, i
     while (i < KC * mRounded) {
       if ((i / MR) % KC < kcmin && i % MR +  MR * (i / (MR * KC)) < m)
         newMatrix[i] = A[(i % MR) * rsA + csA * (((i / MR)) % KC) + rsA * MR * (i / (MR * KC))];
-      i += ((i / MR) % KC >= kcmin) ? (MR * (KC - kcmin)) : (1);
+      i ++;
     }
 }
 
@@ -126,7 +126,7 @@ void packMatrixB(double *B, int rsB, int csB, double* newMatrix, int n, int k, i
   while (i < KC * n) {
       if ((i / NR) % KC < kcmin && i % NR + NR * (i / (NR * KC)) < n)
         newMatrix[i] = B[(i % NR) * csB + ((i / NR) * rsB) % KC + csB * NR * (i / (NR * KC))];
-      i += ((i / NR) % KC >= kcmin) ? (NR * (KC - kcmin)) : (1);
+      i ++;
     }
 
 }
